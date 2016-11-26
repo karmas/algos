@@ -1,0 +1,9 @@
+./bsearch ~/algs4-data/tinyW.txt < ~/algs4-data/tinyT.txt
+50
+99
+13
+
+./bsearch ~/algs4-data/largeW.txt < ~/algs4-data/largeT.txt
+3675966 lines expected
+
+./queue ~/algs4-data/tobe.txt
