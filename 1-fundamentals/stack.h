@@ -72,4 +72,55 @@ struct StackFixed {
 	int _size = 0;
 };
 
+template <typename T>
+struct StackList {
+	struct Node {
+		Node(const T &item, Node *next)
+			: _item(item), _next(next)
+		{ }
+		T _item = T();
+		Node *_next = 0;
+	};
+	void push(const T &item) {
+		Node *node = new Node(item, _top);
+		_top = node;
+		//++_size;
+	}
+
+	T pop() {
+		if (isEmpty()) {
+			cerr << "error: empty" << endl;
+			return T();
+		}
+		const T ret = _top->_item;
+		delete _top;
+		_top = _top->_next;
+		//--_size;
+		return ret;
+	}
+
+	bool isEmpty() const { return _top == 0; }
+	int size() const {
+		//return _size;
+		//return sizeIter();
+		return sizeRecur(_top);
+	}
+	int sizeIter() const {
+		int s = 0;
+		for (Node *node = _top; node; node = node->_next) {
+			++s;
+		}
+		return s;
+	}
+	int sizeRecur(Node *node) const {
+		if (!node) {
+			return 0;
+		}
+		return 1 + sizeRecur(node->_next);
+	}
+
+	//int _size = 0;
+	Node *_top = 0; // points to top
+};
+
 #endif
