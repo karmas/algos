@@ -7,3 +7,11 @@
 3675966 lines expected
 
 ./queue ~/algs4-data/tobe.txt
+
+diff <(./union-find ~/algs4-data/tinyUF.txt) tiny-expect.txt
+
+./union-find ~/algs4-data/mediumUF.txt
+3 components
+
+./union-find ~/algs4-data/largeUF.txt
+6 components

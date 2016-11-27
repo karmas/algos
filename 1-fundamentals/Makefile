@@ -1,7 +1,9 @@
 CXXFLAGS = -g -Wall -std=c++11
 LDLIBS = -lgtest
 
-apps = bsearch eval queue
+apps = bsearch eval queue union-find
+
+union-find: union-find.h
 
 queue: queue.h
 
