@@ -109,6 +109,90 @@ TEST ( insertion, verify )
 	}
 }
 
+TEST ( shell, verify )
+{
+	int samples = 30;
+	for (int i = 0; i < samples; i++) {
+		int n = random(1, 100);
+		int *arr = randomArray(n);
+		if (debug) {
+			printf("\tsample=%d size=%d\n", i, n);
+			printArray(arr, 0, n);
+		}
+		shell(arr, n);
+		if (debug) {
+			printf("\tsorted\n");
+			printArray(arr, 0, n);
+		}
+		ASSERT_TRUE(isSorted(arr, n));
+		ASSERT_TRUE(isSortedRecursive(arr, 0, n));
+		delete[] arr;
+	}
+}
+
+TEST ( merge, verify )
+{
+	int samples = 30;
+	for (int i = 0; i < samples; i++) {
+		int n = random(1, 100);
+		int *arr = randomArray(n);
+		if (debug) {
+			printf("\tsample=%d size=%d\n", i, n);
+			printArray(arr, 0, n);
+		}
+		merge(arr, 0, n);
+		if (debug) {
+			printf("\tsorted\n");
+			printArray(arr, 0, n);
+		}
+		ASSERT_TRUE(isSorted(arr, n));
+		ASSERT_TRUE(isSortedRecursive(arr, 0, n));
+		delete[] arr;
+	}
+}
+
+TEST ( mergeBU, verify )
+{
+	int samples = 30;
+	for (int i = 0; i < samples; i++) {
+		int n = random(1, 100);
+		int *arr = randomArray(n);
+		if (debug) {
+			printf("\tsample=%d size=%d\n", i, n);
+			printArray(arr, 0, n);
+		}
+		mergeBU(arr, n);
+		if (debug) {
+			printf("\tsorted\n");
+			printArray(arr, 0, n);
+		}
+		ASSERT_TRUE(isSorted(arr, n));
+		ASSERT_TRUE(isSortedRecursive(arr, 0, n));
+		delete[] arr;
+	}
+}
+
+TEST ( quick, verify )
+{
+	int samples = 30;
+	for (int i = 0; i < samples; i++) {
+		int n = random(1, 100);
+		int *arr = randomArray(n);
+		if (debug) {
+			printf("\tsample=%d size=%d\n", i, n);
+			printArray(arr, 0, n);
+		}
+		quick(arr, 0, n);
+		if (debug) {
+			printf("\tsorted\n");
+			printArray(arr, 0, n);
+		}
+		ASSERT_TRUE(isSorted(arr, n));
+		ASSERT_TRUE(isSortedRecursive(arr, 0, n));
+		delete[] arr;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	srand(time(0));
