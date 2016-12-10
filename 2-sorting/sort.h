@@ -182,4 +182,67 @@ void quick(T *arr, int s, int e)
 	quick(arr, p + 1, e);
 }
 
+// take first element as pivot
+template <typename T>
+void quick2(T *arr, int s, int e)
+{
+	int n = e - s;
+	if (n <= 1) {
+		return;
+	}
+
+	// (s, i) <= pivot
+	// (j, e) >= pivot
+	// [i, j] unscanned
+	int i = s + 1;
+	int j = e - 1;
+	while (true) {
+		while (i <= j && arr[i] <= arr[s]) {
+			++i;
+		}
+		while (j >= i && arr[j] >= arr[s]) {
+			--j;
+		}
+		if (i > j) break;
+		exch(arr, i++, j--);
+	}
+
+	int p = j;
+	exch(arr, s, p);
+	quick(arr, s, p);
+	quick(arr, p + 1, e);
+}
+
+// take first element as pivot
+template <typename T>
+void quick3way(T *arr, int s, int e)
+{
+	if (e - s <= 1) {
+		return;
+	}
+
+	// (s, p) < pivot
+	// [p, i) == pivot
+	// [i, g) unscanned
+	// [g, e) > pivot
+	int i = s + 1;
+	int p = i;
+	int g = e;
+	while (i < g) {
+		if (arr[i] < arr[s]) {
+			exch(arr, i++, p++);
+		}
+		else if (arr[i] == arr[s]) {
+			++i;
+		}
+		else {
+			exch(arr, i, --g);
+		}
+	}
+
+	exch(arr, s, g - 1);
+	quick3way(arr, s, p);
+	quick3way(arr, g, e);
+}
+
 #endif

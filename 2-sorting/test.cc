@@ -193,6 +193,48 @@ TEST ( quick, verify )
 	}
 }
 
+TEST ( quick2, verify )
+{
+	int samples = 30;
+	for (int i = 0; i < samples; i++) {
+		int n = random(1, 100);
+		int *arr = randomArray(n);
+		if (debug) {
+			printf("\tsample=%d size=%d\n", i, n);
+			printArray(arr, 0, n);
+		}
+		quick2(arr, 0, n);
+		if (debug) {
+			printf("\tsorted\n");
+			printArray(arr, 0, n);
+		}
+		ASSERT_TRUE(isSorted(arr, n));
+		ASSERT_TRUE(isSortedRecursive(arr, 0, n));
+		delete[] arr;
+	}
+}
+
+TEST ( quick3way, verify )
+{
+	int samples = 30;
+	for (int i = 0; i < samples; i++) {
+		int n = random(1, 100);
+		int *arr = randomArray(n);
+		if (debug) {
+			printf("\tsample=%d size=%d\n", i, n);
+			printArray(arr, 0, n);
+		}
+		quick3way(arr, 0, n);
+		if (debug) {
+			printf("\tsorted\n");
+			printArray(arr, 0, n);
+		}
+		ASSERT_TRUE(isSorted(arr, n));
+		ASSERT_TRUE(isSortedRecursive(arr, 0, n));
+		delete[] arr;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	srand(time(0));
