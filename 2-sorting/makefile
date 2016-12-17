@@ -1,7 +1,9 @@
 CXXFLAGS = -g -Wall -std=c++11
 LDLIBS = -lgtest
 
-apps = test
+apps = test pqtest
+
+pqtest: pq.h
 
 test: sort.h
 
