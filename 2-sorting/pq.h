@@ -2,6 +2,7 @@
 #define PQ_H
 
 #include <iostream>
+#include <sstream>
 
 template<typename T>
 void swap(T *arr, int i, int j)
@@ -315,6 +316,129 @@ public:
 	int _len;
 	T *_arr;
 	int _size;
+};
+
+template <typename T>
+void printArray(const T *arr, int n)
+{
+    for (int i = 0; i < n; i++) {
+        if (i > 0) std::cout << " ";
+        std::cout << arr[i];
+    }
+    std::cout << std::endl;
+}
+
+/**
+ * _pq holds indices
+ * _qp is inverse of pq
+ * _keys holds the values
+ */
+template<typename T>
+class IndexMinPQ {
+public:
+    IndexMinPQ(int max)
+        : _len(max + 1),
+        _keys(new T[_len]()),
+        _pq(new int[_len]()),
+        _qp(new int[_len]()),
+        _size(0)
+    {
+        for (int i = 0; i < _len; i++) {
+            _qp[i] = -1;
+        }
+    }
+    ~IndexMinPQ() {
+        delete[] _keys;
+        delete[] _pq;
+        delete[] _qp;
+    }
+
+    void swap(int i, int j) {
+        ::swap(_pq, i, j);
+        ::swap(_qp, i, j);
+    }
+
+    bool less(int i, int j) {
+        return _keys[_pq[i]] < _keys[_pq[j]];
+    }
+
+    void swim(int i) {
+        // i is smaller than children
+        while (i/2 > 0 && less(i, i/2)) {
+            swap(i, i/2);
+            i /= 2;
+        }
+    }
+
+    void sink(int i) {
+        // i is bigger than parent
+        int l = i*2;
+        int r = l+1;
+        while (l <= _size) {
+            int c = l;
+            if (r <= _size && less(r, c)) {
+                c = r;
+            }
+            if (less(i, c)) {
+                break;
+            }
+            swap(i, c);
+            i = c;
+            l = i*2;
+            r = l+1;
+        }
+    }
+
+    // k_th item in _arr[_key[k]]
+    void insert(int k, const T &item) {
+        if (isFull()) {
+            return;
+        }
+        ++_size;
+        _qp[k] = _size;
+        _pq[_size] = k;
+        _keys[k] = item;
+        swim(_size);
+    }
+
+    void change(int k, const T &item) {
+    }
+
+    bool contains(int k) const {
+        return _qp[k] != -1;
+    }
+
+    void del(int k) {
+    }
+
+    T min() const {
+        if (isEmpty()) {
+            return T();
+        }
+        return _keys[_pq[1]];
+    }
+
+    int delMin() {
+        if (isEmpty()) {
+            return -1;
+        }
+        int min = _pq[1];
+        swap(1, _size--);
+        sink(1);
+        _keys[_pq[_size + 1]] = T();
+        _qp[_pq[_size + 1]] = -1;
+        return min;
+    }
+
+    bool isFull() const { return _size + 1 == _len; }
+    bool isEmpty() const { return _size == 0; }
+    int size() const { return _size; }
+
+    int _len;
+    T *_keys;
+    int *_pq;
+    int *_qp;
+    int _size;
 };
 
 #endif

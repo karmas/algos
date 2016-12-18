@@ -245,4 +245,42 @@ void quick3way(T *arr, int s, int e)
 	quick3way(arr, g, e);
 }
 
+int left(int i) { return i * 2 + 1; }
+int right(int i) { return left(i) + 1; }
+int parent(int i) { return (i - 1)/ 2; }
+
+template <typename T>
+void sink(T *arr, int i, int size)
+{
+    // i is less than parent
+    int l = left(i);
+    while (l < size) {
+        int c = l;
+        int r = l + 1;
+        if (r < size && arr[r] > arr[c]) {
+            c = r;
+        }
+        if (arr[i] >= arr[c]) {
+            break;
+        }
+        exch(arr, i, c);
+        i = c;
+        l = left(i);
+    }
+}
+
+template <typename T>
+void heap(T *arr, int n)
+{
+    int heap_size = n;
+    for (int i = n/2; i >= 0; --i) {
+        sink(arr, i, heap_size);
+    }
+
+    for (int i = n; i > 0; --i) {
+        exch(arr, 0, i - 1);
+        sink(arr, 0, i - 1);
+    }
+}
+
 #endif

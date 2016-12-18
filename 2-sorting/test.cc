@@ -235,6 +235,27 @@ TEST ( quick3way, verify )
 	}
 }
 
+TEST ( heap, verify )
+{
+    int samples = 30;
+    for (int i = 0; i < samples; i++) {
+        int n = random(1, 100);
+        int *arr = randomArray(n);
+        if (debug) {
+            printf("\tsample=%d size=%d\n", i, n);
+            printArray(arr, 0, n);
+        }
+        heap(arr, n);
+        if (debug) {
+            printf("\tsorted\n");
+            printArray(arr, 0, n);
+        }
+        ASSERT_TRUE(isSorted(arr, n));
+        ASSERT_TRUE(isSortedRecursive(arr, 0, n));
+        delete[] arr;
+    }
+}
+
 int main(int argc, char **argv)
 {
 	srand(time(0));
