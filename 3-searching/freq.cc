@@ -13,6 +13,7 @@ TEST( freq_counter, validate )
 {
   map<string, int> refMap;
   UnorderedListST<string, int> ulst;
+  OrderedArrayST<string, int> oast;
 
   string word;
   while (cin >> word) {
@@ -23,17 +24,24 @@ TEST( freq_counter, validate )
     map<string, int>::iterator refFound = refMap.find(word);
     if (refFound != refMap.end()) {
       ASSERT_TRUE(ulst.contains(word));
+      ASSERT_TRUE(oast.contains(word));
       int refVal = refFound->second++;
       int ulstVal = ulst.get(word);
+      int oastVal = oast.get(word);
       ASSERT_EQ(refVal, ulstVal);
+      ASSERT_EQ(refVal, oastVal);
       ulst.put(word, ulstVal + 1);
+      oast.put(word, oastVal + 1);
     }
     else {
       ASSERT_FALSE(ulst.contains(word));
+      ASSERT_FALSE(oast.contains(word));
       refMap.insert(make_pair(word, 1));
       ulst.put(word, 1);
+      oast.put(word, 1);
     }
     ASSERT_EQ(refMap.size(), ulst.size());
+    ASSERT_EQ(refMap.size(), oast.size());
   }
 
   map<string, int>::iterator refMax = refMap.begin();
@@ -48,7 +56,14 @@ TEST( freq_counter, validate )
       ulstMax = it;
   }
 
+  int oastMax = oast._vals[0];
+  for (int i = 1; i < oast._size; ++i) {
+    if (oast._vals[i] > oastMax)
+      oastMax = oast._vals[i];
+  }
+
   ASSERT_EQ(refMax->second, ulstMax->_val);
+  ASSERT_EQ(refMax->second, oastMax);
   cout << refMax->first << " " << refMax->second << endl;
 }
 
