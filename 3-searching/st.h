@@ -101,7 +101,7 @@ public:
     if (!found) return;
 
     if (pred) pred->_next = found->_next;
-    else _head = 0;
+    else _head = found->_next;
 
     delete found;
   }
@@ -180,12 +180,10 @@ public:
   size_t size() const { return _size; }
   bool isFull() const { return _size == _len; }
   void print() const {
-    std::cout << "keys: ";
     for (int i = 0; i < _size; i++) {
-      std::cout << i << "->" << _keys[i] << ", ";
+      std::cout << _keys[i] << "->" << _vals[i] << ", ";
     }
     std::cout << " size = " << _size;
-    std::cout << std::endl;
   }
 
   void realloc(int len) {
@@ -217,15 +215,159 @@ public:
     else {
       assert(start - amount >= 0);
       for (int i = start; i <= end; ++i) {
-        arr[i-amount] = arr[i];
+        arr[i+amount] = arr[i];
       }
     }
+  }
+
+  void del(const key_t &k) {
+    int r = rank(k);
+    if (r == _size) {
+      return;
+    }
+    else if (_keys[r] != k) {
+      return;
+    }
+    if (r < _size - 1) {
+      shift(_keys, r + 1, _size - 1, -1);
+      shift(_vals, r + 1, _size - 1, -1);
+    }
+    --_size;
   }
 
   int _len;
   key_t *_keys;
   val_t *_vals;
   int _size;
+};
+
+template <typename key_t, typename val_t>
+class BST {
+public:
+  struct Node {
+    Node(const key_t &k, const val_t &v, Node *l, Node *r)
+      : _key(k), _val(v), _left(l), _right(r), _size(1)
+    { }
+    void print() const {
+      std::cout << _key << "->" << _val << "(" << _size << ")";
+    }
+
+    key_t _key;
+    val_t _val;
+    Node *_left;
+    Node *_right;
+    int _size;
+  };
+
+  BST()
+    : _root(0)
+  { }
+
+  Node *find(Node *node, const key_t &k) const {
+    if (!node) return 0;
+    if (k < node->_key) return find(node->_left, k);
+    else if (k > node->_key) return find(node->_right, k);
+    else { return node; }
+  }
+
+  int size(Node *node) {
+    return node ? node->_size : 0;
+  }
+
+  Node *put(Node *node, const key_t &k, const val_t &v) {
+    if (!node) {
+      Node *newNode = new Node(k, v, 0, 0);
+      return newNode;
+    }
+
+    if (k < node->_key) {
+      node->_left = put(node->_left, k, v);
+    }
+    else if (k > node->_key) {
+      node->_right = put(node->_right, k, v);
+    }
+    else {
+      node->_val = v;
+    }
+    node->_size = size(node->_left) + size(node->_right) + 1;
+    return node;
+  }
+
+  void put(const key_t &k, const val_t &v) {
+    _root = put(_root, k, v);
+  }
+
+  val_t get(const key_t &k) const {
+    Node *found = find(_root, k);
+    if (found) {
+      return found->_val;
+    }
+    else {
+      return val_t();
+    }
+  }
+
+  bool contains(const key_t &k) const {
+    return find(_root, k) != 0;
+  }
+
+  int size() const { return _root ? _root->_size : 0; }
+
+  Node *min(Node *node) {
+    Node *min = node;
+    while (min->_left) min = min->_left;
+    return min;
+  }
+
+  Node *del(Node *node, const key_t &k) {
+    if (!node) return 0;
+    if (k < node->_key) {
+      node->_left = del(node->_left, k);
+    }
+    else if (k > node->_key) {
+      node->_right = del(node->_right, k);
+    }
+    else {
+      Node *ret = 0;
+      if (!node->_left) {
+        ret = node->_right;
+      }
+      else if (!node->_right) {
+        ret = node->_left;
+      }
+      else {
+        Node *m = min(node->_right);
+        Node *succ = new Node(m->_key, m->_val, 0, 0);
+        node->_right = del(node->_right, m->_key);
+        succ->_left = node->_left;
+        succ->_right = node->_right;
+        succ->_size = size(succ->_left) + size(succ->_right) + 1;
+        ret = succ;
+      }
+      delete node;
+      return ret;
+    }
+    node->_size = size(node->_left) + size(node->_right) + 1;
+    return node;
+  }
+
+  void del(const key_t &k) {
+    _root = del(_root, k);
+  }
+
+  void print(Node *node) const {
+    if (!node)
+      return;
+    print(node->_left);
+    node->print();
+    std::cout << ", ";
+    print(node->_right);
+  }
+  void print() const {
+    print(_root);
+  }
+
+  Node *_root;
 };
 
 #endif

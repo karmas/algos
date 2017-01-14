@@ -1,9 +1,11 @@
 CXXFLAGS = -g -Wall -std=c++11
 LDLIBS = -lgtest
 
-.DEFAULT_GOAL = freq
+.DEFAULT_GOAL = testapi
 
-apps = freq tracer
+apps = freq tracer testapi
+
+testapi: testapi.cc st.h
 
 freq: freq.cc st.h
 
