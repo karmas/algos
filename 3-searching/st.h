@@ -313,7 +313,7 @@ public:
 
   int size() const { return _root ? _root->_size : 0; }
 
-  Node *min(Node *node) {
+  Node *min(Node *node) const {
     Node *min = node;
     while (min->_left) min = min->_left;
     return min;
@@ -365,6 +365,116 @@ public:
   }
   void print() const {
     print(_root);
+  }
+
+  key_t min() const {
+    Node *node = min(_root);
+    if (!node) {
+      return key_t();
+    }
+    return node->_key;
+  }
+
+  Node *max(Node *node) const {
+    while (node && node->_right) node = node->_right;
+    return node;
+  }
+
+  key_t max() const {
+    Node *node = max(_root);
+    if (!node) {
+      return key_t();
+    }
+    return node->_key;
+  }
+
+  /**
+   * return largest key that is less than or equal to k
+   */
+  key_t floor(const key_t &k) const {
+    Node *node = floor(_root, k);
+    if (node) return node->_key;
+    return key_t();
+  }
+  Node *floor(Node *node, const key_t &k) const {
+    if (!node) return 0;
+    Node *fl = 0;
+    if (k < node->_key) {
+      fl = floor(node->_left, k);
+    }
+    else if (k > node->_key) {
+      fl = floor(node->_right, k);
+      if (!fl) fl = node;
+    }
+    else {
+      fl = node;
+    }
+    return fl;
+  }
+
+  /**
+   * return smallest key that is greater than or equal to k
+   */
+  key_t ceiling(const key_t &k) const {
+    Node *node = ceiling(_root, k);
+    if (node) return node->_key;
+    return key_t();
+  }
+  Node *ceiling(Node *node, const key_t &k) const {
+    if (!node) return 0;
+    Node *fl = 0;
+    if (k < node->_key) {
+      fl = ceiling(node->_left, k);
+      if (!fl) fl = node;
+    }
+    else if (k > node->_key) {
+      fl = ceiling(node->_right, k);
+    }
+    else {
+      fl = node;
+    }
+    return fl;
+  }
+
+  /**
+   * @return key of given rank
+   */
+  key_t select(int rank) const {
+    Node *node = select(_root, rank);
+    if (!node) return 0;
+    return node->_key;
+  }
+  Node *select(Node *node, int rank) const {
+    if (!node) return 0;
+    if (rank == size(node->_left)) {
+      return node;
+    }
+    else if (rank < size(node->_left)) {
+      return select(node->_left, rank);
+    }
+    else {
+      return select(node->_right, rank - size(node->_left) - 1);
+    }
+  }
+
+  /**
+   * assume key in tree
+   * @return rank of given key
+   */
+  int rank(const key_t &k) const {
+    return rank(_root, k);
+  }
+  int rank(Node *node, const key_t &k) const {
+    if (!node) return 0;
+    if (k < node->_key) {
+      return rank(node->_left, k);
+    }
+    else if (k > node->_key) {
+      return rank(node->_right, k) + size(node->_left) + 1;
+    }
+    else {
+      return size(node->_left);
+    }
   }
 
   Node *_root;

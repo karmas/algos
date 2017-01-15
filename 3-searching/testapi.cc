@@ -1,6 +1,7 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include "gtest/gtest.h"
 #include "st.h"
 
@@ -35,10 +36,29 @@ TEST( random, apis )
     ASSERT_EQ(refst.size(), oast.size());
     ASSERT_EQ(refst.size(), bst.size());
 
+    if (refst.size()) {
+      int refMinKey = min_element(refst.begin(), refst.end())->first;
+      int bstMinKey = bst.min();
+      ASSERT_EQ(refMinKey, bstMinKey);
+      int refMaxKey = max_element(refst.begin(), refst.end())->first;
+      int bstMaxKey = bst.max();
+      ASSERT_EQ(refMaxKey, bstMaxKey);
+    }
+
     int api = rand() % 10;
     if (api < 4) {
       if (debug) printf("api = put\n");
       int key = rand() % calls;
+
+      map<int, int>::const_iterator refCeilingIt = refst.lower_bound(key);
+      int refCeiling = 0;
+      int bstCeiling = bst.ceiling(key);
+      if (refCeilingIt != refst.end()) {
+        refCeiling = refCeilingIt->first;
+      }
+      if (debug) printf("ceiling = %d for %d\n", bstCeiling, key);
+      ASSERT_EQ(refCeiling, bstCeiling);
+
       while (refst.count(key)) {
         if (debug) printf("key = %d already in\n", key);
         key = rand() % calls;
@@ -91,6 +111,10 @@ TEST( random, apis )
       ASSERT_TRUE(ulst.contains(key));
       ASSERT_TRUE(oast.contains(key));
       ASSERT_TRUE(bst.contains(key));
+
+      int refCeiling = refst.lower_bound(key)->first;
+      int bstCeiling = bst.ceiling(key);
+      ASSERT_EQ(refCeiling, bstCeiling);
     }
   }
 }
