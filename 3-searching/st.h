@@ -480,4 +480,142 @@ public:
   Node *_root;
 };
 
+template <typename key_t, typename val_t>
+class RBTree {
+public:
+  struct Node {
+    Node(const key_t k, const val_t &v, Node *l, Node *r, bool color)
+      : _key(k), _val(v), _left(l), _right(r), _color(color), _size(1)
+    { }
+
+    void print() {
+      std::cout << _key << "->" << _val << "(" << _color << ")";
+    }
+
+    key_t _key;
+    val_t _val;
+    Node *_left;
+    Node *_right;
+    bool _color; // true means red
+    int _size;
+  };
+
+  RBTree()
+    : _root(0)
+  { }
+
+  Node *find(Node *node, const key_t &k) const {
+    if (!node) return 0;
+    if (k < node->_key) return find(node->_left, k);
+    else if (k > node->_key) return find(node->_right, k);
+    else { return node; }
+  }
+
+  int size(Node *node) const { return node ? node->_size : 0; }
+  bool isRed(Node *node) const { return node ? node->_color : false; }
+
+  /**
+   * n
+   *  \ <-- red
+   *   r
+   *
+   *   r
+   *  / <-- red
+   * n
+   *
+   */
+  Node *rotateLeft(Node *node) {
+    Node *newRoot = node->_right;
+    assert(newRoot->_color);
+    node->_right = newRoot->_left;
+    newRoot->_left = node;
+    newRoot->_color = node->_color;
+    node->_color = true;
+    newRoot->_size = node->_size;
+    node->_size = 1 + size(node->_left) + size(node->_right);
+    return newRoot;
+  }
+
+  Node *rotateRight(Node *node) {
+    Node *newRoot = node->_left;
+    assert(newRoot->_color);
+    node->_left = newRoot->_right;
+    newRoot->_right = node;
+    newRoot->_color = node->_color;
+    node->_color = true;
+    newRoot->_size = node->_size;
+    node->_size = 1 + size(node->_left) + size(node->_right);
+    return newRoot;
+  }
+
+  // node to red and its children to black;
+  void flipColors(Node *node) {
+    node->_color = true;
+    node->_left->_color = node->_right->_color = false;
+  }
+
+  Node *put(Node *node, const key_t &k, const val_t &v) {
+    if (!node) {
+      Node *newNode = new Node(k, v, 0, 0, true);
+      return newNode;
+    }
+
+    if (k < node->_key) {
+      node->_left = put(node->_left, k, v);
+    }
+    else if (k > node->_key) {
+      node->_right = put(node->_right, k, v);
+    }
+    else {
+      node->_val = v;
+    }
+
+    if (!isRed(node->_left) && isRed(node->_right)) {
+      node = rotateLeft(node);
+    }
+    if (isRed(node->_left) && isRed(node->_left->_left)) {
+      node = rotateRight(node);
+    }
+    if (isRed(node->_left) && isRed(node->_right)) {
+      flipColors(node);
+    }
+
+    node->_size = size(node->_left) + size(node->_right) + 1;
+    return node;
+  }
+
+  void put(const key_t &k, const val_t &v) {
+    _root = put(_root, k, v);
+    _root->_color = false;
+  }
+
+  val_t get(const key_t &k) const {
+    Node *found = find(_root, k);
+    if (found) {
+      return found->_val;
+    }
+    else {
+      return val_t();
+    }
+  }
+
+  bool contains(const key_t &k) const {
+    return find(_root, k) != 0;
+  }
+
+  void print(Node *node) const {
+    if (!node)
+      return;
+    print(node->_left);
+    node->print();
+    std::cout << ", ";
+    print(node->_right);
+  }
+  void print() const {
+    print(_root);
+  }
+
+  Node *_root;
+};
+
 #endif

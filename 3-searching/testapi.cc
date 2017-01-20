@@ -17,6 +17,7 @@ TEST( random, apis )
   UnorderedListST<int, int> ulst;
   OrderedArrayST<int, int> oast;
   BST<int, int> bst;
+  RBTree<int, int> rbst;
 
   for (int i = 0; i < calls; i++) {
     if (debug) {
@@ -29,6 +30,9 @@ TEST( random, apis )
       printf("\n");
       printf("bst: ");
       bst.print();
+      printf("\n");
+      printf("rbst: ");
+      rbst.print();
       printf("\n");
     }
 
@@ -74,6 +78,8 @@ TEST( random, apis )
       ASSERT_TRUE(oast.contains(key));
       bst.put(key, key);
       ASSERT_TRUE(bst.contains(key));
+      rbst.put(key, key);
+      ASSERT_TRUE(rbst.contains(key));
     }
     else if (api > 7) {
       if (debug) printf("api = remove\n");
@@ -111,6 +117,7 @@ TEST( random, apis )
       ASSERT_TRUE(ulst.contains(key));
       ASSERT_TRUE(oast.contains(key));
       ASSERT_TRUE(bst.contains(key));
+      ASSERT_TRUE(rbst.contains(key));
 
       int refCeiling = refst.lower_bound(key)->first;
       int bstCeiling = bst.ceiling(key);
