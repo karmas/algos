@@ -18,6 +18,8 @@ TEST( random, apis )
   OrderedArrayST<int, int> oast;
   BST<int, int> bst;
   RBTree<int, int> rbst;
+  HashST<int, int> hashst(calls/5);
+  HashSTLP<int, int> hashstlp(calls/5);
 
   for (int i = 0; i < calls; i++) {
     if (debug) {
@@ -34,11 +36,19 @@ TEST( random, apis )
       printf("rbst: ");
       rbst.print();
       printf("\n");
+      printf("hashst: ");
+      hashst.print();
+      printf("\n");
+      printf("hashstlp: ");
+      hashstlp.print();
+      printf("\n");
     }
 
     ASSERT_EQ(refst.size(), ulst.size());
     ASSERT_EQ(refst.size(), oast.size());
     ASSERT_EQ(refst.size(), bst.size());
+    ASSERT_EQ(refst.size(), hashst.size());
+    ASSERT_EQ(refst.size(), hashstlp.size());
 
     if (refst.size()) {
       int refMinKey = min_element(refst.begin(), refst.end())->first;
@@ -80,6 +90,10 @@ TEST( random, apis )
       ASSERT_TRUE(bst.contains(key));
       rbst.put(key, key);
       ASSERT_TRUE(rbst.contains(key));
+      hashst.put(key, key);
+      ASSERT_TRUE(hashst.contains(key));
+      hashstlp.put(key, key);
+      ASSERT_TRUE(hashstlp.contains(key));
     }
     else if (api > 7) {
       if (debug) printf("api = remove\n");
@@ -101,6 +115,10 @@ TEST( random, apis )
       ASSERT_FALSE(oast.contains(key));
       bst.del(key);
       ASSERT_FALSE(bst.contains(key));
+      hashst.del(key);
+      ASSERT_FALSE(hashst.contains(key));
+      hashstlp.del(key);
+      ASSERT_FALSE(hashstlp.contains(key));
     }
     else {
       if (debug) printf("api = get\n");
@@ -118,6 +136,8 @@ TEST( random, apis )
       ASSERT_TRUE(oast.contains(key));
       ASSERT_TRUE(bst.contains(key));
       ASSERT_TRUE(rbst.contains(key));
+      ASSERT_TRUE(hashst.contains(key));
+      ASSERT_TRUE(hashstlp.contains(key));
 
       int refCeiling = refst.lower_bound(key)->first;
       int bstCeiling = bst.ceiling(key);

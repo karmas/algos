@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <functional>
 
 //#define DEBUG
 
@@ -616,6 +617,242 @@ public:
   }
 
   Node *_root;
+};
+
+template <typename key_t, typename val_t>
+class HashST {
+public:
+  struct Node {
+    Node(const key_t &k, const val_t &v, Node *n)
+      : _key(k), _val(v), _next(n)
+    { }
+
+    void print() const {
+      std::cout << _key << "->" << _val;
+    }
+
+    static void printList(const Node *node) {
+      if (!node) return;
+      node->print();
+      if (node->_next) std::cout << ", ";
+      printList(node->_next);
+    }
+
+    static Node *find(Node *node, const key_t &k) {
+      while (node && node->_key != k) {
+        node = node->_next;
+      }
+      return node;
+    }
+
+    static Node *del(Node *lis, const key_t &k, bool &removed) {
+      Node *pred = 0;
+      Node *cur = lis;
+      while (cur && cur->_key != k) {
+        pred = cur;
+        cur = cur->_next;
+      }
+      if (!cur) {
+        return lis;
+      }
+      if (pred) {
+        pred->_next = cur->_next;
+      }
+      else {
+        lis = lis->_next;
+      }
+      delete cur;
+      removed = true;
+      return lis;
+    }
+
+    key_t _key;
+    val_t _val;
+    Node *_next;
+  };
+
+
+  HashST(int l)
+    : _len(l), _arr(new Node*[l]()), _size(0)
+  { }
+
+  ~HashST()
+  {
+    delete[] _arr;
+  }
+
+  int hash(const key_t &k) const {
+    return _hash(k) % _len;
+  }
+
+  void put(const key_t &k, const val_t &v) {
+    int h = hash(k);
+    Node *found = find(k);
+    if (found) {
+      found->_val = v;
+    }
+    else {
+      _arr[h] = new Node(k, v, _arr[h]);
+      ++_size;
+    }
+  }
+
+  Node *find(const key_t &k) const {
+    int h = hash(k);
+    Node *chain = _arr[h];
+    return Node::find(chain, k);
+  }
+
+  val_t get(const key_t &k) const {
+    Node *found = find(k);
+    if (found) return found->_val;
+    else return val_t();
+  }
+
+  bool contains(const key_t &k) const {
+    return find(k) != 0;
+  }
+
+  void del(const key_t &k) {
+    int h = hash(k);
+    bool removed = false;
+    _arr[h] = Node::del(_arr[h], k, removed);
+    if (removed) {
+      --_size;
+    }
+  }
+
+  int size() const { return _size; }
+
+  void print() const {
+    printf("len=%d, size=%d\n", _len, _size);
+    for (int i = 0; i < _len; i++) {
+      Node *lis = _arr[i];
+      if (!lis) continue;
+      printf("%d) ", i);
+      Node::printList(lis);
+      printf("\n");
+    }
+  }
+
+  int _len;
+  Node **_arr;
+  int _size;
+  std::hash<key_t> _hash;
+};
+
+template <typename key_t, typename val_t>
+class HashSTLP {
+public:
+  HashSTLP(int l)
+    : _len(l),
+    _keys(new key_t*[l]()),
+    _vals(new val_t[l]()),
+    _size(0)
+  { }
+  ~HashSTLP()
+  {
+    for (int i = 0; i < _len; i++) {
+      delete _keys[i];
+    }
+    delete[] _keys;
+    delete[] _vals;
+  }
+
+  void put(const key_t &k, const val_t &v) {
+    if (_size == _len) {
+      resize(_len * 2);
+    }
+
+    int i = 0;
+    int h = hash(k);
+    for ( ; i < _len && _keys[h];
+        ++i, h = (h + 1) % _len) {
+      if (*_keys[h] == k) {
+        _vals[h] = v;
+        return;
+      }
+    }
+    assert(i < _len);
+    _keys[h] = new key_t(k);
+    _vals[h] = v;
+    ++_size;
+  }
+
+  val_t get(const key_t &k) const {
+    for (int h = hash(k); _keys[h]; h = (h + 1) % _len) {
+      if (*_keys[h] == k) {
+        return _vals[h];
+      }
+    }
+    return val_t();
+  }
+
+  bool contains(const key_t &k) const {
+    for (int h = hash(k); _keys[h]; h = (h + 1) % _len) {
+      if (*_keys[h] == k) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void del(const key_t &k) {
+    int h = hash(k);
+    while (_keys[h] && *_keys[h] != k) {
+      h = (h + 1) % _len;
+    }
+    if (!_keys[h]) {
+      return;
+    }
+    delete _keys[h];
+    _keys[h] = 0;
+    --_size;
+
+    h = (h + 1) % _len;
+    while (_keys[h]) {
+      key_t moveKey = *_keys[h];
+      delete _keys[h];
+      _keys[h] = 0;
+      put(moveKey, _vals[h]);
+      --_size;
+      h = (h + 1) % _len;
+    }
+  }
+
+  int size() const { return _size; }
+
+  void print() const {
+    printf("len=%d, size=%d\n", _len, _size);
+    for (int i = 0; i < _len; i++) {
+      if (!_keys[i])
+        continue;
+      std::cout << i << ") " << *_keys[i] << "->" << _vals[i] << ", ";
+    }
+  }
+
+  void resize(int len) {
+    HashSTLP *st = new HashSTLP(len);
+
+    for (int i = 0; i < _len; ++i) {
+      if (!_keys[i])
+        continue;
+      st->put(*_keys[i], _vals[i]);
+    }
+
+    _len = st->_len;
+    _keys = st->_keys;
+    _vals = st->_vals;
+    _size = st->_size;
+  }
+
+  int _len;
+  key_t **_keys;
+  val_t *_vals;
+  int _size;
+
+  int hash(const key_t &k) const { return _hash(k) % _len; }
+  std::hash<key_t> _hash;
 };
 
 #endif
