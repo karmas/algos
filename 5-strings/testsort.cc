@@ -7,7 +7,7 @@ using namespace std;
 bool debug = false;
 const int numHi = 50;
 const int arrLenHi = 100;
-const int iters = 10;
+const int iters = 100;
 
 TEST( sort, key_indexed )
 {
@@ -81,6 +81,35 @@ TEST( sort, msd )
       print(sam);
     }
     msdSort(sam);
+    if (debug) {
+      printf("after: ");
+      print(sam);
+    }
+    for (size_t i = 0; i < ref.size(); i++) {
+      ASSERT_EQ(ref[i], sam[i]);
+    }
+
+    ref.clear();
+    sam.clear();
+  }
+}
+
+TEST( sort, 3way_string_quick )
+{
+  const int maxLen = 5;
+  for (int i = 0; i < iters; i++) {
+    int n = 1 + random(arrLenHi);
+    vector<string> ref(n, "");
+    vector<string> sam(n, "");
+    randomLengthStrings(sam, maxLen);
+    ref = sam;
+    sort(ref.begin(), ref.end());
+
+    if (debug) {
+      printf("before: ");
+      print(sam);
+    }
+    threeWayQuick(sam);
     if (debug) {
       printf("after: ");
       print(sam);

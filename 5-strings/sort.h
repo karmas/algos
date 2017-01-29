@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <cassert>
 #include <vector>
 #include <iostream>
 
@@ -196,6 +197,55 @@ void msdSort(std::vector<std::string> &arr, int s, int e, int d)
 void msdSort(std::vector<std::string> &arr)
 {
   msdSort(arr, 0, arr.size(), 0);
+}
+
+void exch(std::vector<std::string> &arr, int i, int j)
+{
+  std::string temp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = temp;
+}
+
+char charAt(const std::string &s, size_t d)
+{
+  if (d < s.size()) return s[d];
+  return 0;
+}
+
+/**
+ * @param d the digit to use for partition
+ */
+void threeWayQuick(std::vector<std::string> &arr, int s, int e, size_t d)
+{
+  const int n = e - s;
+  if (n <= 1) return;
+
+  const char pivot = charAt(arr[s], d);
+
+  // [s, q) smaller
+  // [q, i) equal
+  // [i, l) unscanned
+  // [l, e) larger
+  int q = s;
+  int l = e;
+  for (int i = s; i < l; ++i) {
+    const char key = charAt(arr[i], d);
+    if (key < pivot) {
+      exch(arr, i, q++);
+    }
+    else if (key > pivot) {
+      exch(arr, i--, --l);
+    }
+  }
+
+  threeWayQuick(arr, s, q, d);
+  if (pivot > 0) threeWayQuick(arr, q, l, d + 1);
+  threeWayQuick(arr, l, e, d);
+}
+
+void threeWayQuick(std::vector<std::string> &arr)
+{
+  threeWayQuick(arr, 0, arr.size(), 0);
 }
 
 #endif
