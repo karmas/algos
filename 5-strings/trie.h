@@ -161,4 +161,69 @@ struct Trie {
   Node *_root;
 };
 
+template <typename val_t>
+struct Tst {
+  struct Node {
+    char _c = 0;
+    val_t _val = val_t();
+    Node *_left = 0;
+    Node *_mid = 0;
+    Node *_right = 0;
+  };
+
+  Node *find(Node *node, const std::string &key, int kc) {
+    if (!node) return 0;
+    if (key[kc] == node->_c) {
+      if (kc == key.size() - 1) {
+        return node;
+      }
+      else {
+        return find(node->_mid, key, kc + 1);
+      }
+    }
+    else if (key[kc] < node->_c) {
+      return find(node->_left, key, kc);
+    }
+    else {
+      return find(node->_right, key, kc);
+    }
+    return 0;
+  }
+
+  val_t get(const std::string &key) {
+    Node *found = find(_root, key, 0);
+    if (found) return found->_val;
+    return val_t();
+  }
+
+  void put(const std::string &key, const val_t &val) {
+    _root = put(_root, key, val, 0);
+  }
+  Node *put(Node *node, const std::string &key, const val_t &val, int kc) {
+    if (!node) {
+      node = new Node();
+      node->_c = key[kc];
+    }
+
+    if (node->_c == key[kc]) {
+      if (kc == key.size() - 1) {
+        node->_val = val;
+      }
+      else {
+        node->_mid = put(node->_mid, key, val, kc + 1);
+      }
+    }
+    else if (node->_c > key[kc]) {
+      node->_left = put(node->_left, key, val, kc);
+    }
+    else {
+      node->_right = put(node->_right, key, val, kc);
+    }
+    return node;
+  }
+
+  Node *_root = 0;
+  int _size = 0;
+};
+
 #endif

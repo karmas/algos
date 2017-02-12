@@ -16,6 +16,7 @@ TEST( trie, random_apis )
   set<string> allKeys;
   map<string, int> refst;
   Trie<int> trie;
+  Tst<int> tst;
 
   for (int i = 0; i < calls; i++) {
     int randapi = rand() % 10;
@@ -28,6 +29,8 @@ TEST( trie, random_apis )
       refst.insert(make_pair(key, defaultVal));
       trie.put(key, defaultVal);
       ASSERT_TRUE(trie.contains(key));
+      tst.put(key, defaultVal);
+      ASSERT_EQ(tst.get(key), defaultVal);
     }
     else if (randapi < 8) {
       if (refst.size() != 0) {
@@ -42,6 +45,8 @@ TEST( trie, random_apis )
         }
         int trieVal = trie.get(*key);
         ASSERT_EQ(defaultVal, trieVal);
+        int tstVal = tst.get(*key);
+        ASSERT_EQ(defaultVal, tstVal);
       }
     }
     else {
