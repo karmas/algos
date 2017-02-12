@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <iostream>
+#include <vector>
 
 // return number in range [s, e)
 int randomNum(int s, int e)
@@ -25,5 +26,15 @@ void randomString(std::string &s, int maxLen)
     s.append(std::string(1, randomChar()));
   }
 }
+
+void genSubStrings(const std::string &s, std::vector<std::string> &list)
+{
+  for (size_t i = 0; i < s.size(); i++) {
+    for (size_t j = i + 1; j <= s.size(); j++) {
+      list.push_back(s.substr(i, j));
+    }
+  }
+}
+
 
 #endif
