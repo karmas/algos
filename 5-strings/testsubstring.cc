@@ -34,6 +34,10 @@ TEST( substring, search )
       ASSERT_EQ(pos, findSubStringBrute2alt(str, subStrings[i]));
       KMP kmp(subStrings[i]);
       ASSERT_EQ(pos, kmp.search(str));
+      BM bm(subStrings[i]);
+      ASSERT_EQ(pos, bm.search(str));
+      RK rk(subStrings[i]);
+      ASSERT_EQ(pos, rk.search(str));
 
       int j = rand() % maxLen;
       string junk = subStrings[i] + to_string(j);
@@ -47,6 +51,10 @@ TEST( substring, search )
       ASSERT_EQ(pos, findSubStringBrute2alt(str, junk));
       KMP kmp2(junk);
       ASSERT_EQ(pos, kmp2.search(str));
+      BM bm2(junk);
+      ASSERT_EQ(pos, bm2.search(str));
+      RK rk2(junk);
+      ASSERT_EQ(pos, rk2.search(str));
     }
     subStrings.clear();
   }

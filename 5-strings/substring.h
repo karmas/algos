@@ -2,6 +2,7 @@
 #define SUBSTRING_H
 
 #include <iostream>
+#include <cmath>
 
 size_t findSubStringBruteAll(const std::string &s, const std::string &f)
 {
@@ -111,6 +112,79 @@ struct KMP {
   std::string _p;
   int _m;
   int **_dfa;
+};
+
+// boyer moore
+struct BM {
+  static const int R = 128;
+  BM(const std::string &p)
+    : _p(p), _m(_p.size()), _right(new int[R]())
+  {
+    for (int i = 0; i < R; i++) {
+      _right[i] = -1;
+    }
+    // rightmost position of a pattern character
+    for (int i = 0; i < _m; i++) {
+      _right[(int)_p[i]] = i;
+    }
+  }
+
+  size_t search(const std::string &s) const {
+    const int n = s.size();
+    int skip = 0;
+    for (int i = 0; i <= n - _m; i += skip) {
+      int j = _m - 1;
+      for ( ; j >= 0; --j) {
+        if (_p[j] != s[i + j]) break;
+      }
+      if (j == -1) return i;
+      skip = j - _right[(int)s[i + j]];
+      if (skip < 1) skip = 1;
+    }
+    return std::string::npos;
+  }
+
+  std::string _p;
+  int _m;
+  int *_right;
+};
+
+struct RK {
+  static const long R = 128;
+  static const long Q = 11307023;
+  RK(const std::string &p)
+    : _p(p), _m(p.size()), _patHash(hash(_p, _m)),
+    _rm(1)
+  {
+    for (int i = 1; i < _m; i++) {
+      _rm = (R * _rm) % Q;
+    }
+  }
+
+  long hash(const std::string &s, int m) const {
+    long h = 0;
+    for (int i = 0; i < m; i++) {
+      h = (R * h + s[i]) % Q;
+    }
+    return h;
+  }
+
+  size_t search(const std::string &s) const {
+    const int n = s.size();
+    long txtHash = hash(s, _m);
+    if (txtHash == _patHash) return 0;
+    for (int i = _m; i < n; i++) {
+      txtHash = (txtHash + Q - _rm * s[i - _m] % Q) % Q;
+      txtHash = (txtHash * R + s[i]) % Q;
+      if (txtHash == _patHash) return i - _m + 1;
+    }
+    return std::string::npos;
+  }
+
+  std::string _p;
+  int _m;
+  long _patHash;
+  long _rm;
 };
 
 #endif
