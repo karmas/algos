@@ -1,0 +1,40 @@
+./dos movies.txt "/" "Bacon, Kevin"
+Kidman, Nicole
+   Bacon, Kevin
+   Few Good Men, A (1992)
+   Cruise, Tom
+   Days of Thunder (1990)
+   Kidman, Nicole
+Grant, Cary (book says 3 but online says 2)
+   Bacon, Kevin
+   Mystic River (2003)
+   Willis, Susan
+   Majestic, The (2001)
+   Landau, Martin
+   North by Northwest (1959)
+   Grant, Cary
+
+./dos movies.txt "/" "Animal House (1978)"
+Titanic (1997)
+   Animal House (1978)
+   Allen, Karen (I)
+   Raiders of the Lost Ark (1981)
+   Taylor, Rocky (I)
+   Titanic (1997)
+To Catch a Thief (1955)
+   Animal House (1978)
+   Vernon, John (I)
+   Topaz (1969)
+   Hitchcock, Alfred (I)
+   To Catch a Thief (1955)
+
+./dos routes.txt " " JFK
+LAS
+   JFK
+   ORD
+   PHX
+   LAS
+DFW
+   JFK
+   ORD
+   DFW

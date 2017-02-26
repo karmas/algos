@@ -6,6 +6,9 @@
 #include <vector>
 #include <iostream>
 #include <queue>
+#include <map>
+#include <fstream>
+#include <cstring>
 
 struct Graph {
   typedef std::list<int> adjList_t;
@@ -178,6 +181,89 @@ struct CC {
   int _count = 0;
   std::vector<int> _id;
   std::vector<bool> _marked;
+};
+
+struct SymbolGraph {
+  SymbolGraph(const std::string &fname, const std::string &delim)
+    : _g(0)
+  {
+    addMappings(fname, delim);
+    addEdges(fname, delim);
+  }
+
+  ~SymbolGraph() {
+    delete _g;
+  }
+
+  void tokenize(const std::string record, std::vector<std::string> &tokens,
+      const std::string &delim) {
+    const int bufLen = record.size() + 1;
+    char buf[bufLen];
+    std::strncpy(buf, record.c_str(), bufLen);
+    const char *token = std::strtok(buf, delim.c_str());
+    while (token) {
+      tokens.push_back(token);
+      token = std::strtok(0, delim.c_str());
+    }
+    /*
+    for (size_t i = 0; i < tokens.size(); i++) {
+      printf("%s ", tokens[i].c_str());
+    }
+    puts("");
+    */
+  }
+
+  void addMappings(const std::string &fname, const std::string &delim) {
+    std::ifstream inf(fname);
+    std::string line;
+    std::vector<std::string> tokens;
+    while (getline(inf, line)) {
+      tokenize(line, tokens, delim);
+      for (size_t i = 0; i < tokens.size(); i++) {
+        addVertex(tokens[i]);
+      }
+      tokens.clear();
+    }
+    _g = new Graph(_st.size());
+  }
+
+  void addEdges(const std::string &fname, const std::string &delim) {
+    std::ifstream inf(fname);
+    std::string line;
+    std::vector<std::string> tokens;
+    while (getline(inf, line)) {
+      tokenize(line, tokens, delim);
+      int v = index(tokens[0]);
+      for (size_t i = 1; i < tokens.size(); i++) {
+        _g->addEdge(v, index(tokens[i]));
+      }
+      tokens.clear();
+    }
+  }
+
+  void addVertex(const std::string &vs) {
+    if (contains(vs)) return;
+    int v = _st.size();
+    _st.insert(make_pair(vs, v));
+    _keys.push_back(vs);
+  }
+
+  bool contains(const std::string &key) const {
+    return _st.count(key) == 1;
+  }
+  int index(const std::string &key) const {
+    std::map<std::string, int>::const_iterator it = _st.find(key);
+    if (it != _st.end()) {
+      return it->second;
+    }
+    return -1;
+  }
+  std::string name(int v) const { return _keys[v]; }
+  Graph &G() const { return *_g; }
+
+  std::map<std::string, int> _st;
+  std::vector<std::string> _keys;
+  Graph *_g;
 };
 
 #endif

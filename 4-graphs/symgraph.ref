@@ -1,0 +1,23 @@
+./symgraph routes.txt " "
+JFK
+   ORD
+   ATL
+   MCO
+LAX
+   LAS
+   PHX
+
+./symgraph movies.txt "/"
+Tin Men (1987)
+   DeBoy, David
+   Blumenfeld, Alan
+   ...
+   Geppi, Cindy
+   Hershey, Barbara
+   ...
+Bacon, Kevin
+   Mystic River (2003)
+   Friday the 13th (1980)
+   Flatliners (1990)
+   Few Good Men, A (1992)
+   ...
